@@ -160,3 +160,26 @@ set sql_safe_updates=1;
  
 select * from online_retail3;
 select * from online_retail3 where Country ='France';
+
+ALTER TABLE online_retail3 
+ADD COLUMN CustomerID_clean INT;
+-- Nonaktifkan safe updates
+SET SQL_SAFE_UPDATES = 0;
+
+-- Update CustomerID_clean dengan nilai sebelum titik
+UPDATE online_retail3
+SET CustomerID_clean = CAST(SUBSTRING_INDEX(TRIM(CustomerID), '.', 1) AS UNSIGNED)
+WHERE CustomerID IS NOT NULL;
+
+SET SQL_SAFE_UPDATES=0;
+UPDATE online_retail3
+SET CustomerID = CAST(CustomerID_clean AS CHAR)
+WHERE CustomerID_clean IS NOT NULL;
+
+select * from online_retail3 where CustomerID IS NULL;
+set sql_safe_updates=0;
+ALTER TABLE online_retail3
+DROP COLUMN CustomerID_clean;
+
+select *from online_retail3;
+
